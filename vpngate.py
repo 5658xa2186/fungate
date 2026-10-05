@@ -311,7 +311,7 @@ def classify_network(host, exit_org, is_datacenter=None):
 def check_one(node, session):
     """调用 Worker 检测单节点。返回节点+检测结果的合并 dict。
     单节点失败 (网络错误/非 200/坏 JSON) 不会抛出, 统一记 success=False。"""
-    url = WORKER_CHECK_URL + quote(f"{node['host']}:{node['port']}", safe="")
+    url = WORKER_CHECK_URL + quote(f"{node['host']}:{node['port']}", safe=":")
     out = dict(node)
     out["protocol"] = "sstp"
     out["link"] = f"sstp://vpn:vpn@{node['host']}:{node['port']}"
