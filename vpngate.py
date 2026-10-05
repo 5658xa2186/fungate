@@ -52,6 +52,7 @@ VPNGATE_MIRROR = os.environ.get(
 )
 # 已部署的 Cloudflare Worker 检测接口 (GET /check?proxyip=host:port, 实测确认)
 #WORKER_CHECK_URL = os.environ.get("CHECK_WORKER", "https://lively-fungate.superxa2186.workers.dev/check?sstp=vpn:vpn@")
+#WORKER_CHECK_URL = "https://lively-fungate.superxa2186.workers.dev/check?sstp=vpn:vpn@"
 WORKER_CHECK_URL = "https://lively-fungate.superxa2186.workers.dev/check?sstp=vpn:vpn@"
 CONCURRENCY = max(1, int(os.environ.get("CHECK_CONCURRENCY", "32")))   # 与 Worker 网页端一致的并发模型
 CHECK_TIMEOUT = float(os.environ.get("CHECK_TIMEOUT", "90"))          # 单请求客户端超时 (秒)
@@ -678,8 +679,10 @@ def main():
 
     log("CLOUDFLARE WORKER", f"检测成功: {len(success)}")
     log("CLOUDFLARE WORKER", f"检测失败: {len(failed)}" + (f" (其中 Worker 异常 {len(worker_errors)})" if worker_errors else ""))
+    if worker_errors:
+        log("CLOUDFLARE WORKER", f"【真實報錯原因】: {worker_errors[0].get('error')}")
     log("CLOUDFLARE WORKER", f"耗时: {elapsed:.1f}s")
-
+    
     # 硬性失败: Worker 完全不可达 (没有任何一个请求拿到正常响应)
     if uniq and not success and len(worker_errors) == len(uniq):
         die("Worker 全部请求异常, 检测服务不可用 — 本次运行判定失败 (不生成空结果)")
