@@ -11,13 +11,16 @@ permissions:
   id-token: write
 
 concurrency:
-  group: gate-check
+  group: pages-gate-check
   cancel-in-progress: false
 
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,28 +29,29 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: pip
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install --disable-pip-version-check -r requirements.txt
 
-      - name: Get VPN Gate nodes + check via Cloudflare Worker + build page
+      - name: Check nodes and build page
         run: python vpngate.py
         env:
-          CHECK_WORKER: "https://check.helei.kdns.fr/check?sstp=vpn:vpn@"
+          CHECK_WORKER: ${{ secrets.CHECK_WORKER }}
           CHECK_CONCURRENCY: "32"
           CHECK_TIMEOUT: "90"
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'public'
+          path: public
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
       - name: Show site URL
-        run: 'echo "site: https://jerylihub.github.io/gate/ (deploy outcome: ${{ steps.deployment.outcome }})"'
+        if: always()
+        run: |
+          echo "outcome=${{ steps.deployment.outcome }}"
+          echo "url=${{ steps.deployment.outputs.page_url }}"
