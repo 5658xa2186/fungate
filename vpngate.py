@@ -57,7 +57,7 @@ VPNGATE_MIRROR = os.environ.get(
     "https://raw.githubusercontent.com/fdciabdul/Vpngate-Scraper-API/main/json/data.json",
 )
 WORKER_CHECK_URL = os.environ.get(
-    "CHECK_WORKER", "https://check.helei.kdns.fr/check?sstp=vpn:vpn@"
+    "CHECK_WORKER", "https://autumn-0800092.superxa2186.workers.dev/check?sstp=vpn:vpn@"
 )
 CONCURRENCY = max(1, int(os.environ.get("CHECK_CONCURRENCY", "32")))
 CHECK_TIMEOUT = float(os.environ.get("CHECK_TIMEOUT", "90"))
@@ -80,8 +80,8 @@ EDGE_HOSTS: List[str] = [
     h.strip()
     for h in os.environ.get(
         "EDGE_HOSTS",
-        "saas.072159.xyz:443,hzytjy.cn:443,ali.nonull.pp.ua:443,auto.dolby.dpdns.org:443,"
-        "cdn.cnno.de:443,saas.sin.fan:443,cf.777791.xyz:443",
+        "104.21.80.52:443,104.18.48.164:443,104.21.23.166:443,auto.dolby.dpdns.org:443,"
+        "cdn.cnno.de:443,104.21.34.127:443,104.19.71.239:443",
     ).split(",")
     if h.strip()
 ]
