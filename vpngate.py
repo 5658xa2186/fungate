@@ -51,11 +51,11 @@ VPNGATE_MIRROR = os.environ.get(
     "VPNGATE_MIRROR",
     "https://raw.githubusercontent.com/fdciabdul/Vpngate-Scraper-API/main/json/data.json",
 )
-# Cloudflare Worker 检测接口. 建议整段放进 GitHub secret CHECK_WORKER
+# Cloudflare Worker 检测接口. 可用环境变量 CHECK_WORKER 覆盖
 # 兼容两种写法:
 #   https://xxx.workers.dev/check?sstp=vpn:vpn@
 #   https://xxx.workers.dev/check
-WORKER_CHECK_URL = os.environ.get("CHECK_WORKER", "").strip()
+WORKER_CHECK_URL = (os.environ.get("CHECK_WORKER") or "https://check.helei.kdns.fr/check?sstp=vpn:vpn@").strip()
 CONCURRENCY = max(1, int(os.environ.get("CHECK_CONCURRENCY", "32")))
 CHECK_TIMEOUT = float(os.environ.get("CHECK_TIMEOUT", "90"))
 CHECK_RETRIES = max(1, int(os.environ.get("CHECK_RETRIES", "2")))
@@ -704,9 +704,6 @@ def write_outputs(data):
 # main
 # ---------------------------------------------------------------------------
 def main():
-    if not WORKER_CHECK_URL:
-        die("未设置 CHECK_WORKER, 拒绝空跑 (不生成空结果)")
-
     # 1) 数据源
     rows, source = fetch_vpngate()
     raw_count = len(rows)
